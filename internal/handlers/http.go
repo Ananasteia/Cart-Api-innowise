@@ -1,17 +1,17 @@
 package handlers
 
 import (
-	"Cart_Api_New/internal/services"
+	"Cart_Api_New/internal/models"
 	"context"
 	"net/http"
 	"strings"
 )
 
 type appInterface interface {
-	SaveItem(ctx context.Context, ci services.CartItem) (*services.CartItem, error)
-	DeleteItem(ctx context.Context, ci services.CartItem) error
-	GetCart(ctx context.Context, cartId int) (*services.Cart, error)
-	CreateNewCart(ctx context.Context) (*services.Cart, error)
+	SaveItem(ctx context.Context, ci models.CartItem) (*models.CartItem, error)
+	DeleteItem(ctx context.Context, ci models.CartItem) error
+	GetCart(ctx context.Context, cartId int) (*models.Cart, error)
+	CreateNewCart(ctx context.Context) (*models.Cart, error)
 }
 type api struct {
 	app appInterface
@@ -41,7 +41,7 @@ func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	case r.Method == http.MethodGet:
-		err := a.ViewCart(w, r)
+		err := a.GetCart(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}

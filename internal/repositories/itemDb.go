@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"Cart_Api_New/internal/models"
-	"Cart_Api_New/internal/services"
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -16,7 +15,7 @@ func NewCartItemRepository(db *sqlx.DB) *CartItemRepository {
 	return &CartItemRepository{sql: db}
 }
 
-func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem services.CartItem) (*services.CartItem, error) {
+func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem models.CartItem) (*models.CartItem, error) {
 	const query = `insert into items (cart_id, product, quantity ) values ($1, $2, $3) returning *`
 
 	var dbItem models.CartItem
@@ -29,7 +28,7 @@ func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem services.Car
 	return dbItem.Convert(), nil
 }
 
-func (r *CartItemRepository) DeleteItem(ctx context.Context, cartItem services.CartItem) error {
+func (r *CartItemRepository) DeleteItem(ctx context.Context, cartItem models.CartItem) error {
 	const query = `delete from items WHERE id = $1 and cart_id = $2 `
 	_, err := r.sql.ExecContext(ctx, query, cartItem.Id, cartItem.CartId)
 	if err != nil {

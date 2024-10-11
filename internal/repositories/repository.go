@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"Cart_Api_New/internal/services"
+	"Cart_Api_New/internal/models"
 	"context"
 	"github.com/jmoiron/sqlx"
 )
@@ -13,12 +13,12 @@ type Repo struct {
 
 type (
 	CartItem interface {
-		SaveItem(ctx context.Context, cartItem services.CartItem) (*services.CartItem, error)
-		DeleteItem(ctx context.Context, cartItem services.CartItem) error
+		SaveItem(ctx context.Context, cartItem models.CartItem) (*models.CartItem, error)
+		DeleteItem(ctx context.Context, cartItem models.CartItem) error
 	}
 	Cart interface {
-		GetCart(ctx context.Context, cartId int) (*services.Cart, error)
-		CreateNewCart(ctx context.Context) (*services.Cart, error)
+		GetCart(ctx context.Context, cartId int) (*models.Cart, error)
+		CreateNewCart(ctx context.Context) (*models.Cart, error)
 	}
 )
 

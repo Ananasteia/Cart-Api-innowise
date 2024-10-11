@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"Cart_Api_New/internal/services"
+	"Cart_Api_New/internal/models"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -17,15 +17,15 @@ func (a *api) AddToCart(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("strconv.Atoi: %w", err)
 	}
 
-	var newItem services.CartItem
+	var newItem models.CartItem
 
 	err = json.NewDecoder(r.Body).Decode(&newItem)
 	if err != nil {
 		return fmt.Errorf("json.NewDecoder: %w", err)
 	}
 
-	if newItem.Quantity < 0 {
-		return fmt.Errorf("Quantity couldn't be negative ")
+	if newItem.Quantity <= 0 {
+		return fmt.Errorf("Quantity couldn't be non positive ")
 	}
 
 	newItem.CartId = idNumber
@@ -56,7 +56,7 @@ func (a *api) RemoveFromCart(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("strconv.Atoi: %w", err)
 	}
 
-	var newItemToDelete services.CartItem
+	var newItemToDelete models.CartItem
 
 	newItemToDelete.CartId = idCartNumber
 	newItemToDelete.Id = idItemNumber

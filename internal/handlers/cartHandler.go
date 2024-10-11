@@ -22,7 +22,7 @@ func (a *api) CreateCart(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (a *api) ViewCart(w http.ResponseWriter, r *http.Request) error {
+func (a *api) GetCart(w http.ResponseWriter, r *http.Request) error {
 	path := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
 	idCartNumber, err := strconv.Atoi(path[1])
 	if err != nil {

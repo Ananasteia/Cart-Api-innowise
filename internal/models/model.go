@@ -1,7 +1,5 @@
 package models
 
-import "Cart_Api_New/internal/services"
-
 type Cart struct {
 	Id    int        `db:"id"`
 	Items []CartItem `db:"cart_item"`
@@ -14,8 +12,8 @@ type CartItem struct {
 	Quantity int    `db:"quantity"`
 }
 
-func (c *CartItem) Convert() *services.CartItem {
-	return &services.CartItem{
+func (c *CartItem) Convert() *CartItem {
+	return &CartItem{
 		Id:       c.Id,
 		CartId:   c.CartId,
 		Product:  c.Product,
@@ -23,12 +21,12 @@ func (c *CartItem) Convert() *services.CartItem {
 	}
 }
 
-func (c *Cart) Convert() *services.Cart {
-	items := make([]services.CartItem, len(c.Items))
+func (c *Cart) Convert() *Cart {
+	items := make([]CartItem, len(c.Items))
 	for i, item := range c.Items {
 		items[i] = *item.Convert()
 	}
-	return &services.Cart{
+	return &Cart{
 		Id:    c.Id,
 		Items: items,
 	}

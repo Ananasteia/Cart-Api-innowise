@@ -2,7 +2,6 @@ package repositories
 
 import (
 	"Cart_Api_New/internal/models"
-	"Cart_Api_New/internal/services"
 	"context"
 	"fmt"
 	"github.com/jmoiron/sqlx"
@@ -16,7 +15,7 @@ func NewCartRepository(db *sqlx.DB) *CartRepository {
 	return &CartRepository{sql: db}
 }
 
-func (r *CartRepository) CreateNewCart(ctx context.Context) (*services.Cart, error) {
+func (r *CartRepository) CreateNewCart(ctx context.Context) (*models.Cart, error) {
 	const query = `insert into carts default values returning *`
 
 	var dbCart models.Cart
@@ -29,7 +28,7 @@ func (r *CartRepository) CreateNewCart(ctx context.Context) (*services.Cart, err
 	return dbCart.Convert(), nil
 }
 
-func (r *CartRepository) GetCart(ctx context.Context, cartId int) (*services.Cart, error) {
+func (r *CartRepository) GetCart(ctx context.Context, cartId int) (*models.Cart, error) {
 	const query = `select * from items WHERE cart_id = $1`
 
 	const queryCart = `select * from carts WHERE id = $1`
