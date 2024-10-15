@@ -56,8 +56,6 @@ func TestCartRepository_CreateNewCart(t *testing.T) {
 			db, mock, err := sqlmock.New()
 			assert.NoError(t, err)
 
-			//defer db.Close()
-
 			sqlxDB := sqlx.NewDb(db, "123")
 			repo := repositories.New(sqlxDB)
 

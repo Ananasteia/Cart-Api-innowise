@@ -3,25 +3,24 @@ package services
 import (
 	"Cart_Api_New/internal/models"
 	"context"
-	"fmt"
 	"log"
 )
 
 func (a *Service) CreateNewCart(ctx context.Context) (models.Cart, error) {
 	newCart, err := a.repo.CreateNewCart(ctx)
 	if err != nil {
-		log.Print("a.repo.CreateNewCart: ", err)
-		return models.Cart{}, fmt.Errorf("a.repositories.CreateNewCart: %w", err)
+		log.Printf("a.repo.CreateNewCart: %v", err)
+		return models.Cart{}, err
 	}
 
 	return newCart, nil
 }
 
-func (a *Service) GetCart(ctx context.Context, c int) (models.Cart, error) {
-	viewedCart, err := a.repo.GetCart(ctx, c)
+func (a *Service) GetCart(ctx context.Context, idCart int) (models.Cart, error) {
+	viewedCart, err := a.repo.GetCart(ctx, idCart)
 	if err != nil {
-		log.Println("a.repo.GetCart: ", err)
-		return models.Cart{}, fmt.Errorf("a.repositories.GetItem: %w", err)
+		log.Printf("a.repo.GetCart: %v", err)
+		return models.Cart{}, err
 	}
 
 	return viewedCart, nil

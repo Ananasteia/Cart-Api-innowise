@@ -1,9 +1,9 @@
 package repositories
 
 import (
+	"Cart_Api_New/internal/errorsx"
 	"Cart_Api_New/internal/models"
 	"context"
-	"fmt"
 	"github.com/jmoiron/sqlx"
 	"log"
 )
@@ -25,7 +25,7 @@ func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem models.CartI
 
 	err := r.sql.GetContext(ctx, &dbItem, query, cartItem.CartId, cartItem.Product, cartItem.Quantity)
 	if err != nil {
-		return models.CartItem{}, fmt.Errorf("r.sql.GetContext: %w", err)
+		return models.CartItem{}, err
 	}
 
 	log.Println("new item is successfully created: ", dbItem.Id)
@@ -34,9 +34,17 @@ func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem models.CartI
 
 func (r *CartItemRepository) DeleteItem(ctx context.Context, cartItem models.CartItem) error {
 	const query = `DELETE FROM items WHERE id = $1 AND cart_id = $2 `
-	_, err := r.sql.ExecContext(ctx, query, cartItem.Id, cartItem.CartId)
+	result, err := r.sql.ExecContext(ctx, query, cartItem.Id, cartItem.CartId)
 	if err != nil {
-		return fmt.Errorf("r.sql.ExecContext: %w", err)
+		return err
+	}
+
+	count, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if count == 0 {
+		return errorsx.NoExistanceErr
 	}
 
 	log.Println("cart is successfully deleted")

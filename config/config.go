@@ -2,7 +2,6 @@ package config
 
 import (
 	"gopkg.in/yaml.v3"
-	"log"
 	"os"
 )
 
@@ -29,24 +28,19 @@ func (c Connector) DSN() (string, error) {
 	return c.ConnectionDSN, nil
 }
 
-func ReadConfig(cfgPath string) Config {
+func ReadConfig(cfgPath string) (Config, error) {
 	file, err := os.Open(cfgPath)
 	if err != nil {
-		log.Fatal(err) // return err
+		return Config{}, err
 	}
 
-	defer func() {
-		err := file.Close() // you can just defer file.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	defer file.Close()
 
 	cfg := Config{}
 	err = yaml.NewDecoder(file).Decode(&cfg)
 	if err != nil {
-		log.Fatal(err) // return err
+		return Config{}, err
 	}
 
-	return cfg
+	return cfg, err
 }

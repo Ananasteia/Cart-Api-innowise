@@ -8,7 +8,6 @@ import (
 	"Cart_Api_New/internal/services"
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -25,23 +24,33 @@ func main() {
 		syscall.SIGHUP, syscall.SIGINT, syscall.SIGQUIT, syscall.SIGABRT, syscall.SIGTERM)
 	defer cancel()
 
-	cfg := config.ReadConfig(*cfgFile)
-
-	db, err := database.New(ctx, cfg.DBConfig)
-
+	cfg, err := config.ReadConfig(*cfgFile)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer db.Close() // in database.New -???????
 
-	newRepository := repositories.New(db)
-	newApp := services.New(newRepository)
-	newApi := handlers.New(newApp)
-	serverHTTP := http.Server{
-		Addr:    net.JoinHostPort(cfg.Server.Host, cfg.Server.Port),
-		Handler: newApi,
+	db, err := database.New(ctx, cfg.DBConfig)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	fmt.Printf("server is running on: %s:%s", cfg.Server.Host, cfg.Server.Port)
-	log.Fatal(serverHTTP.ListenAndServe())
+	defer db.Close()
+
+	newRepository := repositories.New(db)
+	newService := services.New(newRepository)
+	newApi := handlers.New(newService)
+	serveMux := newApi.Handle()
+	newServer := server(serveMux, cfg.Server)
+
+	log.Printf("server is running on: %s:%s", cfg.Server.Host, cfg.Server.Port)
+	if err := newServer.ListenAndServe(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func server(mux *http.ServeMux, cfg config.Server) *http.Server {
+	return &http.Server{
+		Addr:    net.JoinHostPort(cfg.Host, cfg.Port),
+		Handler: mux,
+	}
 }

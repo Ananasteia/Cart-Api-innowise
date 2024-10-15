@@ -5,7 +5,9 @@ import (
 )
 
 var (
-	StatusServerErr = errors.New("OOPS, something went wrong")
-	NumberInvalid   = errors.New("not valid info, try again")
-	QuantityInvalid = errors.New("quantity couldn't be non positive")
+	InternalServerErr  = errors.New("OOPS, something went wrong")
+	InvalidIdErr       = errors.New("not valid item id, try again")
+	InvalidCartIdErr   = errors.New("not valid cart id, try again")
+	InvalidQuantityErr = errors.New("quantity should be positive")
+	NoExistanceErr     = errors.New("item doesn't exist in this cart")
 )
