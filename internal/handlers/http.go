@@ -3,55 +3,42 @@ package handlers
 import (
 	"Cart_Api_New/internal/models"
 	"context"
+	"encoding/json"
+	"log"
 	"net/http"
-	"strings"
 )
 
 type appInterface interface {
-	SaveItem(ctx context.Context, ci models.CartItem) (*models.CartItem, error)
+	SaveItem(ctx context.Context, ci models.CartItem) (models.CartItem, error)
 	DeleteItem(ctx context.Context, ci models.CartItem) error
-	GetCart(ctx context.Context, cartId int) (*models.Cart, error)
-	CreateNewCart(ctx context.Context) (*models.Cart, error)
+	GetCart(ctx context.Context, cartId int) (models.Cart, error)
+	CreateNewCart(ctx context.Context) (models.Cart, error)
 }
 type api struct {
 	app appInterface
 }
 
-func New(a appInterface) http.Handler {
+func New(a appInterface) *http.ServeMux {
 	newApi := &api{
 		app: a,
 	}
-	return newApi
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /carts", newApi.CreateCart)
+	mux.HandleFunc("GET /carts/{id}", newApi.GetCart)
+	mux.HandleFunc("DELETE /carts/{cartId}/items/{id}", newApi.RemoveFromCart)
+	mux.HandleFunc("POST /carts/{cartId}/items", newApi.AddToCart)
+	return mux
+
 }
 
-func (a *api) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	switch {
-	case r.Method == http.MethodPost:
-		path := strings.Split(strings.Trim(r.URL.Path, "/"), "/")
-		switch {
-		case len(path) == 1 && path[0] == "carts":
-			err := a.CreateCart(w, r)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		case len(path) == 3 && path[0] == "carts" && path[2] == "items":
-			err := a.AddToCart(w, r)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-			}
-		}
-	case r.Method == http.MethodGet:
-		err := a.GetCart(w, r)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	case r.Method == http.MethodDelete:
-		err := a.RemoveFromCart(w, r)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	default:
-		http.Error(w, "rest.ServeHTTP", http.StatusBadRequest)
+func errorWrite(w http.ResponseWriter, text error, statusCode int) {
 
+	w.WriteHeader(statusCode)
+
+	err := json.NewEncoder(w).Encode(text)
+	if err != nil {
+		log.Println(err)
 	}
+	log.Println(statusCode, text)
 }

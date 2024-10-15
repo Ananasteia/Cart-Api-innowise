@@ -40,6 +40,7 @@ func New(ctx context.Context, cfg config.DBConfig) (*sqlx.DB, error) {
 	}
 
 	return db, nil
+
 }
 
 func (r *Repo) Close() error {

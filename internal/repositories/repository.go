@@ -13,12 +13,12 @@ type Repo struct {
 
 type (
 	CartItem interface {
-		SaveItem(ctx context.Context, cartItem models.CartItem) (*models.CartItem, error)
+		SaveItem(ctx context.Context, cartItem models.CartItem) (models.CartItem, error)
 		DeleteItem(ctx context.Context, cartItem models.CartItem) error
 	}
 	Cart interface {
-		GetCart(ctx context.Context, cartId int) (*models.Cart, error)
-		CreateNewCart(ctx context.Context) (*models.Cart, error)
+		GetCart(ctx context.Context, cartId int) (models.Cart, error)
+		CreateNewCart(ctx context.Context) (models.Cart, error)
 	}
 )
 

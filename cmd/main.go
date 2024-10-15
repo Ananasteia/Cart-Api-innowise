@@ -27,21 +27,12 @@ func main() {
 
 	cfg := config.ReadConfig(*cfgFile)
 
-	db, err := database.New(ctx, config.DBConfig{ // just cfg.DBConfig
-		Migrates: cfg.DBConfig.Migrates,
-		Driver:   cfg.DBConfig.Driver,
-		Postgres: config.Connector{ConnectionDSN: cfg.DBConfig.Postgres.ConnectionDSN}, // in database.New
-	})
+	db, err := database.New(ctx, cfg.DBConfig)
 
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer func() { // in database.New
-		err := db.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+	defer db.Close() // in database.New -???????
 
 	newRepository := repositories.New(db)
 	newApp := services.New(newRepository)

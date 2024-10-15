@@ -15,6 +15,7 @@ create table items
     product  text                     not null,
     quantity integer                  not null,
 
+    unique (cart_id, product),
     primary key (id)
 );
 
