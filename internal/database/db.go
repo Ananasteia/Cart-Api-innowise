@@ -23,12 +23,7 @@ func New(ctx context.Context, cfg config.DBConfig) (*sqlx.DB, error) {
 		return nil, err
 	}
 
-	dsn, err := cfg.Postgres.DSN()
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := sqlx.Open(cfg.Driver, dsn)
+	db, err := sqlx.Open(cfg.Driver, cfg.Postgres.ConnectionDSN)
 	if err != nil {
 		return nil, err
 	}

@@ -4,11 +4,14 @@ import (
 	"Cart_Api_New/internal/services"
 	"log"
 	"net/http"
+	"time"
 )
 
 type Handler struct {
 	service services.Servicer
 }
+
+const requestTimeToProcess = time.Second * 1
 
 func (h Handler) Handle() *http.ServeMux {
 	mux := http.NewServeMux()

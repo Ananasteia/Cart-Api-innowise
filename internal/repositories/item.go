@@ -17,12 +17,10 @@ func NewCartItemRepository(db *sqlx.DB) *CartItemRepository {
 }
 
 func (r *CartItemRepository) SaveItem(ctx context.Context, cartItem models.CartItem) (models.CartItem, error) {
+	var dbItem models.CartItem
 	const query = `INSERT INTO items (cart_id, product, quantity ) VALUES ($1, $2, $3)  
 	ON CONFLICT (cart_id, product) DO UPDATE SET quantity = items.quantity + EXCLUDED.quantity 
 	RETURNING *`
-
-	var dbItem models.CartItem
-
 	err := r.sql.GetContext(ctx, &dbItem, query, cartItem.CartId, cartItem.Product, cartItem.Quantity)
 	if err != nil {
 		return models.CartItem{}, err
@@ -44,7 +42,7 @@ func (r *CartItemRepository) DeleteItem(ctx context.Context, cartItem models.Car
 		return err
 	}
 	if count == 0 {
-		return errorsx.NoExistanceErr
+		return errorsx.ItemNotExistErr
 	}
 
 	log.Println("cart is successfully deleted")

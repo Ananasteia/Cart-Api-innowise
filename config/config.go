@@ -42,5 +42,5 @@ func ReadConfig(cfgPath string) (Config, error) {
 		return Config{}, err
 	}
 
-	return cfg, err
+	return cfg, nil
 }

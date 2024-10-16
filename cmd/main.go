@@ -38,9 +38,8 @@ func main() {
 
 	newRepository := repositories.New(db)
 	newService := services.New(newRepository)
-	newApi := handlers.New(newService)
-	serveMux := newApi.Handle()
-	newServer := server(serveMux, cfg.Server)
+	newHandler := handlers.New(newService)
+	newServer := server(newHandler, cfg.Server)
 
 	log.Printf("server is running on: %s:%s", cfg.Server.Host, cfg.Server.Port)
 	if err := newServer.ListenAndServe(); err != nil {
@@ -48,9 +47,9 @@ func main() {
 	}
 }
 
-func server(mux *http.ServeMux, cfg config.Server) *http.Server {
+func server(handler handlers.Handler, cfg config.Server) *http.Server {
 	return &http.Server{
 		Addr:    net.JoinHostPort(cfg.Host, cfg.Port),
-		Handler: mux,
+		Handler: handler.Handle(),
 	}
 }

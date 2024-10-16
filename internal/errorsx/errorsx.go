@@ -9,5 +9,6 @@ var (
 	InvalidIdErr       = errors.New("not valid item id, try again")
 	InvalidCartIdErr   = errors.New("not valid cart id, try again")
 	InvalidQuantityErr = errors.New("quantity should be positive")
-	NoExistanceErr     = errors.New("item doesn't exist in this cart")
+	ItemNotExistErr    = errors.New("item doesn't exist in this cart")
+	CartNotExistErr    = errors.New("cart doesn't exist")
 )

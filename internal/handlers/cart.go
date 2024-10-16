@@ -8,16 +8,13 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func (h Handler) CreateCart(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*1)
-
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
 	defer cancel()
 
 	newCart, err := h.service.CreateNewCart(ctx)
-
 	if err != nil {
 		log.Printf("from h.service.CreateNewCart: %v", err)
 		errorWrite(w, errorsx.InternalServerErr, http.StatusInternalServerError)
@@ -40,17 +37,18 @@ func (h Handler) GetCart(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*1)
-
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
 	defer cancel()
 
 	showedCart, err := h.service.GetCart(ctx, idCartNumber)
-	if errors.Is(err, errorsx.InvalidCartIdErr) {
-		errorWrite(w, errorsx.InvalidCartIdErr, http.StatusBadRequest)
+	switch {
+	case errors.Is(err, errorsx.InvalidCartIdErr):
+		errorWrite(w, errorsx.InvalidCartIdErr, http.StatusNotFound)
 		return
-	}
-
-	if err != nil {
+	case errors.Is(err, errorsx.CartNotExistErr):
+		errorWrite(w, errorsx.CartNotExistErr, http.StatusNotFound)
+		return
+	case err != nil:
 		log.Printf("from h.service.GetCart: %v", err)
 		errorWrite(w, errorsx.InternalServerErr, http.StatusInternalServerError)
 		return

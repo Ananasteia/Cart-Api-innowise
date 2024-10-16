@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 func (h Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
@@ -36,8 +35,7 @@ func (h Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 
 	newItem.CartId = idNumber
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*1)
-
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
 	defer cancel()
 
 	savedItem, err := h.service.SaveItem(ctx, newItem)
@@ -75,16 +73,15 @@ func (h Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	newItemToDelete.CartId = idCartNumber
 	newItemToDelete.Id = idItemNumber
 
-	ctx, cancel := context.WithTimeout(r.Context(), time.Second*1)
-
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
 	defer cancel()
 
 	err = h.service.DeleteItem(ctx, newItemToDelete)
-	if errors.Is(err, errorsx.NoExistanceErr) {
-		errorWrite(w, errorsx.NoExistanceErr, http.StatusBadRequest)
+	switch {
+	case errors.Is(err, errorsx.ItemNotExistErr):
+		errorWrite(w, errorsx.ItemNotExistErr, http.StatusNotFound)
 		return
-	}
-	if err != nil {
+	case err != nil:
 		log.Printf("h.service.DeleteItem: %v", err)
 		errorWrite(w, errorsx.InternalServerErr, http.StatusInternalServerError)
 		return
