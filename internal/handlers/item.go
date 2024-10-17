@@ -12,6 +12,9 @@ import (
 )
 
 func (h Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
+	defer cancel()
+
 	idNumber, err := strconv.Atoi(r.PathValue("cartId"))
 	if err != nil {
 		log.Printf("from strconv.Atoi: %v", err)
@@ -35,9 +38,6 @@ func (h Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 
 	newItem.CartId = idNumber
 
-	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
-	defer cancel()
-
 	savedItem, err := h.service.SaveItem(ctx, newItem)
 	if err != nil {
 		log.Printf("from h.service.SaveItem: %v", err)
@@ -54,6 +54,9 @@ func (h Handler) AddToCart(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
+	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
+	defer cancel()
+
 	idCartNumber, err := strconv.Atoi(r.PathValue("cartId"))
 	if err != nil {
 		log.Printf("strconv.Atoi: %v", err)
@@ -73,17 +76,16 @@ func (h Handler) RemoveFromCart(w http.ResponseWriter, r *http.Request) {
 	newItemToDelete.CartId = idCartNumber
 	newItemToDelete.Id = idItemNumber
 
-	ctx, cancel := context.WithTimeout(r.Context(), requestTimeToProcess)
-	defer cancel()
-
 	err = h.service.DeleteItem(ctx, newItemToDelete)
-	switch {
-	case errors.Is(err, errorsx.ItemNotExistErr):
-		errorWrite(w, errorsx.ItemNotExistErr, http.StatusNotFound)
-		return
-	case err != nil:
-		log.Printf("h.service.DeleteItem: %v", err)
-		errorWrite(w, errorsx.InternalServerErr, http.StatusInternalServerError)
-		return
+	if err != nil {
+		switch {
+		case errors.Is(err, errorsx.ItemNotExistErr):
+			errorWrite(w, errorsx.ItemNotExistErr, http.StatusNotFound)
+			return
+		default:
+			log.Printf("h.service.DeleteItem: %v", err)
+			errorWrite(w, errorsx.InternalServerErr, http.StatusInternalServerError)
+			return
+		}
 	}
 }

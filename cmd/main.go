@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	cfgFile = flag.String("cfg", "./config/config.yml", "path to config file")
+	cfgFile = flag.String("cfg", "/build/config.yml", "path to config file")
 )
 
 func main() {

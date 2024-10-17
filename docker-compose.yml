@@ -10,5 +10,15 @@ services:
       - "5432:5432"
     volumes:
       - "data:/var/lib/postgresql/data"
+  cart-api:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    container_name: "cart-api"
+    restart: always
+    volumes:
+      - "./config/config.yml:/build/config.yml"
+    ports:
+      - "8080:8080"
 volumes:
   data:
